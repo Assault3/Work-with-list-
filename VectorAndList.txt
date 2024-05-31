@@ -1,0 +1,209 @@
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+
+template <class T> class Vector {
+    int size;
+    int capacity;
+    T* arr;
+public:
+    Vector() {
+        size = 0;
+        capacity = 10;
+        arr = new T[capacity];
+    }
+    void push_back(T data) {
+        if (size == capacity) {
+            T* temp = new T[capacity * 2];
+            for (int i = 0; i < size; i++)
+                temp[i] = arr[i];
+            delete[] arr;
+            capacity *= 2;
+            arr = temp;
+        }
+        arr[size++] = data;
+    }
+
+    void pop_back()
+    {
+        size--;
+    }
+
+    void push_front(T data)
+    {
+        if (size == capacity) {
+            T* temp = new T[capacity * 2];
+            for (int i = 0; i < size; i++)
+                temp[i] = arr[i];
+            delete[] arr;
+            capacity *= 2;
+            arr = temp;
+        }
+        size++;
+        for(int i = size; i > 0; i--)
+        {
+            arr[i] = arr[i - 1];
+        }
+        arr[0] = data;
+    }
+
+    void pop_front()
+    {
+        size--;
+        for(int i = 0; i < size; i++)
+        {
+            arr[i] = arr[i + 1];
+        }
+    }
+
+    friend ostream& operator<<(ostream& os, const Vector& vector) {
+        os << "[";
+        for (int i = 0; i < vector.size; i++)
+            os << vector.arr[i] << " ";
+        os << "]" << endl << vector.size;
+        return os;
+    }
+
+    T operator [](int index) {
+        return arr[index];
+    }
+
+    virtual ~Vector() {
+        delete[] arr;
+    }
+};
+
+
+template <class T> class List {
+    class Node {
+    public:
+        T value; 
+        Node* next;
+        Node(T value = T(), Node* next = nullptr) : value(value), next(next) {}
+    };
+    int size;
+    Node* head;
+public:
+    List() {
+        size = 0;
+        head = nullptr;
+    }
+
+    void push_back(T data) {
+        if (head == nullptr) {
+            head = new Node(data);
+        }
+        else {
+            Node* current = head;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = new Node(data);
+        }
+        size++;
+    }
+
+
+    void push_front(T data)
+    {
+        if(head == nullptr)
+        {
+            head = new Node(data);
+        }
+        else
+        {
+            Node* temp = new Node(head->value, head->next);
+            head->value = data;
+            head->next = temp;
+        }
+        size++;
+    }
+
+
+   void pop_back() 
+    {
+        if (head == nullptr) 
+        {
+            cout << "list is empty";
+        }
+        else if (head->next == nullptr) 
+        {
+            delete head;
+            head = nullptr;
+        }
+        else 
+        {
+            Node* current = head;
+            for(int i = 0; i < size - 2; i++)
+            {
+                current = current->next;
+            }
+            delete current->next;
+            current->next = nullptr;
+        }
+        size--;
+    }
+
+
+    void pop_front()
+    {
+        if(head->next == nullptr)
+        {
+            delete head;
+            head = nullptr;
+        }
+        else
+        {
+            Node* temp = head ->next;
+            delete head;
+            head = temp;
+
+        }
+        size--;
+    }
+
+
+    T operator[](int index)
+    {
+        Node* current = head;
+        for(int i = 0; i < index; i++)
+        {
+            current = current->next;
+        }
+        return current->value;
+    }
+
+
+    friend ostream& operator<<(ostream& os, const List& list) {
+        os << "[";
+        for (Node* cur = list.head; cur != nullptr; cur = cur->next) {
+            os << cur->value << " ";
+        }
+        os << "]";
+
+        return os;
+    }
+
+
+    ~List()
+    {
+        while(size!=0)
+        {
+            pop_back();
+        }
+    }
+};
+
+
+int main() {
+    List<int> l;
+    for (int i = 0; i < 100; i++) {
+        l.push_back(i + 1);
+    }
+    l.push_front(0);
+    cout << l << endl;
+    return 0;
+}
+// ToDo List:
+// Implement push_front, pop_back, pop_front and [] operator

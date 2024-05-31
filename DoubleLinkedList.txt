@@ -1,0 +1,173 @@
+#include<iostream>
+using namespace std;
+template<typename T> class DoubleLinkedList {
+    class Node {
+    public:
+        T value;
+        Node* next;
+        Node* prev;
+        Node(T value, Node* next, Node* prev) : value(value), next(next), prev(prev) {}
+    };
+    int size;
+    Node* head;
+    Node* tail;
+public:
+    DoubleLinkedList() {
+        size = 0;
+        head = tail = nullptr;
+    }
+    void push_back(T data) {
+        if (head == nullptr) {
+            head = new Node(data, nullptr, nullptr);
+            tail = head;
+        }
+        else {
+            Node* temp = new Node(data, nullptr, tail);
+            tail->next = temp;
+            tail = tail->next;
+        }
+        size++;
+    }
+    void push_front(T data) {
+        if (head == nullptr) {
+            head = new Node(data, nullptr, nullptr);
+            tail = head;
+        }
+        else {
+            Node* temp = new Node(data, head, nullptr);
+            head->prev = temp;
+            head = head->prev;
+        }
+        size++;
+    }
+    void pop_back() {
+        if (size == 1) {
+            delete head;
+            head = tail = nullptr;
+        }
+        else {
+            tail = tail->prev;
+            delete tail->next;
+            tail->next = nullptr;
+        }
+        size--;
+    }
+    void pop_front() {
+        if (size == 1) {
+            delete head;
+            head = tail = nullptr;
+        }
+        else {
+            head = head->next;
+            delete head->prev;
+            head->prev = nullptr;
+        }
+        size--;
+    }
+    int length() {
+        return size;
+    }
+    T operator [] (int index) {
+        Node* cur = head;
+        for (int i = 0; i < index; i++)
+            cur = cur->next;
+        return cur->value;
+    }
+
+    void set(T data, int index)
+    {
+        Node* cur = head;
+        for (int i = 0; i < index; i++)
+            cur = cur->next;
+        cur->value = data;
+    }
+    void remove(int index) {
+        // delete element on index position
+        Node* cur = nullptr;
+        if(index <= size / 2)
+        {
+            cur = head;
+            for (int i = 0; i < index; i++)
+                cur = cur->next;
+        }
+        else
+        {
+            cur = tail;
+            for (int i = size - 1; i > index; i--)
+            {
+                cur = cur->prev;            
+            }
+        }
+        cur->prev->next = cur->next;
+        cur->next->prev = cur->prev;
+        delete cur;
+        size--;
+    }
+
+    void add(T data, int index) {
+        // add element data into index position;
+        Node* cur = nullptr;
+        if(index <= size / 2)
+        {
+            cur = head;
+            for (int i = 0; i < index; i++)
+            {
+                cur = cur->next;
+            }
+        }
+        else
+        {
+            cur = tail;
+            for(int i = size - 1; i > index;i--)
+            {
+                cur = cur->prev;
+            }
+        }
+        Node* temp = new Node(data, cur, cur->prev);
+        cur->prev->next = temp;
+        cur->prev = temp;
+        size++;
+    }
+
+
+    bool operator == (DoubleLinkedList<T>& another) {
+        if (this->size == another.size)
+        {
+            Node* cur = head;
+            Node* cur1 = another.head;
+            for(int i = 0; i < size; i++)
+            {
+                if(cur->value != cur1->value)
+                {
+                    return false;
+                }
+                cur = cur->next;
+                cur1 = cur1->next;
+            }
+            return true;
+        }
+        return false;
+    }
+    bool operator != (DoubleLinkedList<T>& another) {
+        return ! (* this == another);
+    }
+    ~DoubleLinkedList() {
+        while (size != 0)
+            pop_back();
+    }
+};
+int main() {
+    DoubleLinkedList<int> list;
+    for (int i = 1; i < 101; i++)
+        list.push_back(i);
+    list.push_front(0);
+    list.remove(1); //[0, 2, 3, 4, 5, ...]
+    list.add(1, 1); //[0, 1, 2, 3, 4...]
+    //list.set(-1, 0); // [-1, 1, 2, ...]
+    for (int i = 0; i < list.length(); i++)
+        cout << list[i] << " ";
+    return 0;
+}
+// DLL:
+// front, back: O(1);
+// remove, add, get, []: O(n)
